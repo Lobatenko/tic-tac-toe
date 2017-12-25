@@ -1,0 +1,36 @@
+body{
+    padding: 20px;
+}
+h1{
+    color: green;
+    text-align: center;
+    font-size: 50px;
+    font-family: Monospace;
+    margin: 0;
+}
+hr{
+    width: 225px;
+    margin: 35px auto;
+    text-align: center;
+    margin-top: 25px
+}
+#game{
+    width: 300px;
+    height: 300px;
+    margin: 0 auto;
+    background-color: #008000;
+    border: 10px double #008053;
+    border-radius: 10px;
+}
+.block{
+    float: left;
+    width: 100px;
+    height: 100px;
+    box-sizing: border-box;
+    border: 1px solid #006400;
+    text-align: center;
+    line-height: 100px;
+    font-size: 50px;
+    text-transform: uppercase;
+    color: #fff;
+}
