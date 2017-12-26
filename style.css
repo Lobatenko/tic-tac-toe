@@ -19,8 +19,6 @@ hr{
     height: 300px;
     margin: 0 auto;
     background-color: #008000;
-    border: 10px double #008053;
-    border-radius: 10px;
 }
 .block{
     float: left;
