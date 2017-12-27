@@ -8,6 +8,7 @@ window.onload = function(){
 
     document.getElementById("game").onclick = function(){
         //console.log(event);
+
         if (event.target.className = 'block'){
             if (step % 2 == 0){
                 event.target.innerHTML = "x";
@@ -15,13 +16,25 @@ window.onload = function(){
                 event.target.innerHTML = "0";
             }
             step++;
+
             checkWinner();
         }
     }
+
+
+
     // check Winner
     function checkWinner(){
         var allblock = document.getElementsByClassName('block');
-        if (allblock[0].innerHTML == 'x' && allblock[1].innerHTML == 'x' && allblock[2].innerHTML == 'x' ){
+
+        for (var i = 0; i < 9; i++){
+        if (allblock[i].innerHTML == 'x' || allblock[i].innerHTML == '0' ){
+            allblock[i].disabled = 'disabled';
+            alert('1');
+        }
+    }
+
+          if (allblock[0].innerHTML == 'x' && allblock[1].innerHTML == 'x' && allblock[2].innerHTML == 'x' ){
             alert("First player WIN!");
             reset();
         }
@@ -86,7 +99,13 @@ window.onload = function(){
             reset();
         }
     }
-
+//   function isFill(){
+//       var allblock = document.getElementsByClassName('block');
+//
+//    if (allblock == "x" && allblock= "0" ){
+//        document.getElementsByClassName('block').disabled = "disabled";
+//    }
+//   }
     // reset cells
      function reset(){
         var allblock = document.getElementsByClassName('block');
@@ -94,9 +113,6 @@ window.onload = function(){
                 allblock[i].innerHTML = " ";
             }
         }
-//    }
-//    function isDraw() {
-//        alert("Draw");
-//    }
+
 
 }
