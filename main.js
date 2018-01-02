@@ -1,118 +1,135 @@
-/**
- * Created by Mauri on 25.12.17.
- */
 
-window.onload = function(){
 
-    var step = 0;
+var origBoard;
+const huPlayer = '0';
+const aiPlayer = 'X';
+const winCombos = [
+    [0,1,2],
+    [3,4,5],
+    [6,7,8],
+    [0,3,6],
+    [1,4,7],
+    [2,5,8],
+    [0,4,8],
+    [2,4,6]
+]
+const cells = document.querySelectorAll('.cell');
+startGame();
 
-    document.getElementById("game").onclick = function(){
-        //console.log(event);
+function startGame(){
+    document.querySelector('.endgame').style.display = "none" ;
+    origBoard = Array.from( Array(9).keys());
+    for (var i = 0; i < cells.length; i++){
+        cells[i].innerText = '';
+        cells[i].style.removeProperty('background-color');
+        cells[i].addEventListener('click', turnClick, false);
+    }
+}
+function turnClick(square){
+    if (typeof origBoard[square.target.id] == 'number'){
+        turn(square.target.id, huPlayer) ;
+        if (!checkTie()) turn(bestSpot(), aiPlayer);
+    }
 
-        if (event.target.className = 'block'){
-            if (step % 2 == 0){
-                event.target.innerHTML = "x";
-            }else{
-                event.target.innerHTML = "0";
+}
+function turn(squareId, player){
+    origBoard[squareId] = player;
+    document.getElementById(squareId).innerText = player;
+    var gameWon = checkWin(origBoard, player);
+    if (gameWon) gameOver(gameWon)
+}
+
+function checkWin(board, player){
+    var plays = board.reduce((a, e, i) =>
+        (e === player) ? a.concat(i) : a, []);
+    var gameWon = null;
+    for (var [index, win] of winCombos.entries()){
+        if (win.every(elem => plays.indexOf(elem) > -1)){
+            gameWon = {index: index, player: player};
+            break;
+        }
+    }
+    return gameWon;
+    }
+
+function gameOver(gameWon){
+    for (var index of winCombos[gameWon.index]) {
+        document.getElementById(index).style.backgroundColor =
+        gameWon.player == huPlayer ? "blue" : "red";
+    }
+    for (var i = 0; i < cells.length; i++) {
+        cells[i].removeEventListener('click', turnClick, false);
+    }
+    declareWinner(gameWon.player == huPlayer ? "You win!" : "You lose!");
+}
+function declareWinner(who){
+    document.querySelector(".endgame").style.display = "block";
+    document.querySelector(".endgame .text").innerText = who ;
+}
+function emptySquares(){
+    return origBoard.filter(s => typeof s == 'number')
+}
+function bestSpot(){
+    return minimax(origBoard, aiPlayer).index;
+}
+
+function checkTie(){
+    if (emptySquares().length == 0){
+        for (var i = 0; i > cells.length; i++){
+            cells[i].style.backgroundColor = "green";
+            cells[i].removeEventListener('click', turnClick, false);
+        }
+        declareWinner("Tie Game!");
+        return true;
+    }
+    return false;
+    }
+
+function minimax(newBoard, player) {
+    var availSpots = emptySquares(newBoard);
+
+    if (checkWin(newBoard, player)) {
+        return {score: -10};
+    } else if (checkWin (newBoard, aiPlayer)){
+        return { score: 20};
+    }else if (availSpots.length === 0) {
+        return {score: 0};
+    }
+    var moves =[];
+    for (var i = 0; i < availSpots.length; i++){
+        var move = {};
+        move.index = newBoard[availSpots[i]];
+        newBoard[availSpots[i]] = player;
+        if (player == aiPlayer) {
+            var result = minimax(newBoard, huPlayer);
+            move.score = result.score;
+        }else{
+            var result = minimax(newBoard, aiPlayer);
+            move.score = result.score;
+        }
+
+        newBoard[availSpots[i]] = move.index;
+
+        moves.push(move);
+    }
+    var bestMove;
+    if(player === aiPlayer) {
+        var bestScore = -10000;
+        for (var i = 0 ; i < moves.length; i++){
+            if (moves[i].score > bestScore){
+                bestScore = moves[i].score;
+                bestMove = i;
             }
-            step++;
-
-            checkWinner();
         }
-    }
-
-
-
-    // check Winner
-    function checkWinner(){
-        var allblock = document.getElementsByClassName('block');
-
-        for (var i = 0; i < 9; i++){
-        if (allblock[i].innerHTML == 'x' || allblock[i].innerHTML == '0' ){
-            allblock[i].disabled = 'disabled';
-            alert('1');
-        }
-    }
-
-          if (allblock[0].innerHTML == 'x' && allblock[1].innerHTML == 'x' && allblock[2].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[3].innerHTML == 'x' && allblock[4].innerHTML == 'x' && allblock[5].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[6].innerHTML == 'x' && allblock[7].innerHTML == 'x' && allblock[8].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[0].innerHTML == 'x' && allblock[3].innerHTML == 'x' && allblock[6].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[1].innerHTML == 'x' && allblock[4].innerHTML == 'x' && allblock[7].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[2].innerHTML == 'x' && allblock[5].innerHTML == 'x' && allblock[8].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[0].innerHTML == 'x' && allblock[4].innerHTML == 'x' && allblock[8].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[2].innerHTML == 'x' && allblock[4].innerHTML == 'x' && allblock[6].innerHTML == 'x' ){
-            alert("First player WIN!");
-            reset();
-        }
-        if (allblock[0].innerHTML == '0' && allblock[1].innerHTML == '0' && allblock[2].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[3].innerHTML == '0' && allblock[4].innerHTML == '0' && allblock[5].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[6].innerHTML == '0' && allblock[7].innerHTML == '0' && allblock[8].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[0].innerHTML == '0' && allblock[3].innerHTML == '0' && allblock[6].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[1].innerHTML == '0' && allblock[4].innerHTML == '0' && allblock[7].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[2].innerHTML == '0' && allblock[5].innerHTML == '0' && allblock[8].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[0].innerHTML == '0' && allblock[4].innerHTML == '0' && allblock[8].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-        if (allblock[2].innerHTML == '0' && allblock[4].innerHTML == '0' && allblock[6].innerHTML == '0' ){
-            alert("Second player WIN!");
-            reset();
-        }
-    }
-//   function isFill(){
-//       var allblock = document.getElementsByClassName('block');
-//
-//    if (allblock == "x" && allblock= "0" ){
-//        document.getElementsByClassName('block').disabled = "disabled";
-//    }
-//   }
-    // reset cells
-     function reset(){
-        var allblock = document.getElementsByClassName('block');
-            for (var i = 0; i <9; i++){
-                allblock[i].innerHTML = " ";
+    } else {
+        var bestScore = 10000;
+        for (var i = 0 ; i < moves.length; i++){
+            if (moves[i].score < bestScore){
+                bestScore = moves[i].score;
+                bestMove = i;
             }
         }
-
+    }
+    return moves [bestMove];
 
 }
